@@ -1,0 +1,15 @@
+pool_name: Pool_Orquestra_HLG
+lb_vs: LB_Orquestra_HLG
+dest_address_vs: 10.64.18.44
+port_vs: 443
+
+
+node:
+  - { node_ip: '10.64.100.220', node_name: 'orquestra_hlg_hostname' } 
+  - { node_ip: '10.64.100.201', node_name: 'orquestra_hlg_hostname' } 
+
+monitor: [ 'https_443', 'tcp' ]
+lv_profiles: [ 'HSTS_Profile', 'SSL_e-unicred_Client', 'SSL_e-unicred' ]
+lv_irules: [ 'Irule_cookie_remove_name_server' ]
+
+

@@ -1,0 +1,92 @@
+- name: Include vars of hlg/gestorcredito_hlg.yml 
+  include_vars:
+    file: hlg/gestorcredito_hlg.yml
+  tags:
+     - gestor
+- name: Create a Node 
+  bigip_node:
+      server: "{{ server_bigip }}"
+      user:   "{{ user_bigip }}"
+      password: "{{ user_passwd }}"
+      state: present
+      partition: Common
+      monitors: icmp
+      validate_certs: False
+      host: "{{ item.node_ip }}"
+      name: "{{ item.node_name }}"
+  with_items: "{{ node }}"  
+  delegate_to: localhost 
+  tags:
+     - gestor
+
+- name: Create a Pool "{{ pool_name }}"
+  bigip_pool:
+        server: "{{ server_bigip }}" 
+        user:   "{{ user_bigip }}"
+        password: "{{ user_passwd }}"
+        state: present
+        lb_method: round_robin
+        monitor_type: and_list
+        monitors: "{{ monitor }}"
+        name: "{{ pool_name }}"
+        validate_certs: False
+  #with_items: "{{ monitor }}"
+  delegate_to: localhost
+  tags:
+     - gestor
+
+- name: Add Members to a Pool "{{ pool_name }}"
+  bigip_pool_member:
+        server: "{{ server_bigip }}"
+        user:   "{{ user_bigip }}"
+        password: "{{ user_passwd }}"
+        state: present
+        pool: "{{ pool_name }}"
+        host: "{{ item.node_ip }}"
+        name: "{{ item.node_name }}"
+        port: 443
+        validate_certs: False
+  with_items: "{{ node }}" 
+  delegate_to: localhost
+  tags:
+     - gestor
+
+- name: Create a Virtual server  "{{ lb_vs }}"
+  bigip_virtual_server:
+        server: "{{ server_bigip }}"
+        user:   "{{ user_bigip }}"
+        password: "{{ user_passwd }}"
+        state: present
+        name: "{{ lb_vs }}"
+        destination: "{{ dest_address_vs }}" 
+        port: "{{ port_vs }}"
+        snat: "Automap"
+        all_profiles: "{{ lv_profiles }}"
+        all_rules: "{{ lv_irules }}"
+        pool: "{{ pool_name }}"
+        validate_certs: False
+  #with_items:  "{{ lv_profiles }}" 
+    #-  "{{ lv_irules }}"
+     
+  delegate_to: localhost
+  tags:
+     - gestor
+- name: Create a redirect virtual server "{{ lb_vs }}_80"     
+  bigip_virtual_server:
+        description: "Redirect Virtual server"
+        server: "{{ server_bigip }}"
+        user: "{{ user_bigip }}"
+        password: "{{ user_passwd }}"
+        name: "{{ lb_vs }}_80"
+        destination: "{{ dest_address_vs }}"
+        validate_certs: False
+        port: 80
+        all_profiles:
+            - http
+            - tcp
+        all_rules:                              
+            -  RedirectToHTTPS
+            - Irule_cookie_remove_name_server
+  delegate_to: localhost
+  tags:
+     - gestor

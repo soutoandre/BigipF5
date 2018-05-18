@@ -1,0 +1,4 @@
+---
+server_bigip: 10.64.10.20
+user_bigip : "{{ vault_bigip_admin }}"
+user_passwd: "{{ vault_bigip_passwd }}"

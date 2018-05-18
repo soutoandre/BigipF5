@@ -1,0 +1,9 @@
+- hosts: bigip
+  tasks:
+  - name: Collect BIG-IP facts
+    bigip_facts:
+      server: "{{ server_bigip }}"
+      user:   "{{ user_bigip }}"
+      password: "{{ user_passwd }}"
+      include: interface,vlan
+    delegate_to: localhost

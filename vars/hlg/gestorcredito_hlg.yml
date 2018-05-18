@@ -1,0 +1,11 @@
+pool_name: Pool_Gestorcredito_HLG
+lb_vs: LB_GestorCredito_HLG
+dest_address_vs: 10.64.19.44
+port_vs: 443
+
+node:
+  - { node_ip: '10.64.100.183', node_name: 'gestorcredito_hostname' } 
+
+monitor: [ 'https_443', 'tcp' ]
+lv_profiles: [ 'HSTS_Profile', 'SSL_e-unicred_Client', 'SSL_e-unicred' ]
+lv_irules: [ 'Irule_cookie_remove_name_server' ]

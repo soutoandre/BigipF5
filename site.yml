@@ -1,0 +1,25 @@
+---
+- name: Provisioning Orquestra
+  gather_facts: false
+  hosts: bigip 
+  remote_user: admin
+  roles: 
+      - orquestra
+
+  environment:
+     http_proxy: "http://192.168.0.20:8080" 
+     https_proxy: "http://192.168.0.20:8080"
+     no_proxy: "127.0.0.1, localhost" 
+
+
+- name: Provisioning Gestor Credito
+  gather_facts: false
+  hosts: bigip
+  remote_user: admin
+  roles:
+      - gestor
+
+  environment:
+     http_proxy: "http://192.168.0.20:8080"
+     https_proxy: "http://192.168.0.20:8080"
+     no_proxy: "127.0.0.1, localhost"
